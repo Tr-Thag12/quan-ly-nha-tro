@@ -291,6 +291,27 @@ function nhan($ma, $danh_muc)
     return '<span class="badge badge-' . e($ma) . '">' . e($ten) . '</span>';
 }
 
+/**
+ * PH004 – AC3 (v0.2): số người đang ở so với số người tối đa, ví dụ 3/4.
+ * Phòng chưa có ai ở hiện màu xám, phòng đã đủ người hiện màu cam.
+ * Rê chuột vào con số sẽ thấy giải thích đầy đủ.
+ */
+function so_nguoi($dang_o, $toi_da)
+{
+    $dang_o = (int)$dang_o;
+    $toi_da = (int)$toi_da;
+    $lop    = 'occ';
+    $giai_thich = $dang_o . ' người đang ở, tối đa ' . $toi_da . ' người';
+    if ($dang_o === 0) {
+        $lop .= ' occ-empty';
+    } elseif ($dang_o >= $toi_da) {
+        $lop .= ' occ-full';
+        $giai_thich .= ' (đã đủ người)';
+    }
+    return '<span class="' . $lop . '" title="' . e($giai_thich) . '">'
+         . $dang_o . '<small>/' . $toi_da . '</small></span>';
+}
+
 /** Tô sáng mục menu của trang đang mở. */
 function menu_active($tien_to)
 {

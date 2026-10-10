@@ -16,7 +16,7 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 
 define('APP_NAME', 'Quản lý Nhà trọ');
-define('APP_VERSION', 'Sprint 1 (v0.1)');
+define('APP_VERSION', 'Sprint 1 (v0.2)');
 
 // Các con số lấy thẳng từ Acceptance Criteria trong Product Backlog
 define('SO_LAN_SAI_TOI_DA', 5);      // TK001 – AC2: sai quá 5 lần thì khóa

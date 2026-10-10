@@ -76,7 +76,7 @@ require __DIR__ . '/includes/header.php';
             </ul>
         <?php endif; ?>
 
-        <p>Trang này sẽ tạo cơ sở dữ liệu <code><?= e(DB_NAME) ?></code>, tạo 5 bảng và nạp dữ liệu mẫu gồm 24 phòng, 19 khách thuê, 19 hợp đồng và 3 tài khoản.</p>
+        <p>Trang này sẽ tạo cơ sở dữ liệu <code><?= e(DB_NAME) ?></code>, tạo 6 bảng và nạp dữ liệu mẫu gồm 24 phòng, 35 khách thuê (31 người đang ở), 19 hợp đồng và 3 tài khoản.</p>
         <div class="alert alert-warning" style="margin-top:16px">
             Nếu đã cài trước đó, toàn bộ dữ liệu hiện có sẽ bị xóa và nạp lại từ đầu.
         </div>

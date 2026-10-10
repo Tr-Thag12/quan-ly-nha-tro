@@ -4,6 +4,8 @@
  *  PH004 – XEM DANH SÁCH PHÒNG
  *    AC1: Hiển thị mã phòng, tầng, giá, trạng thái, tên khách đang ở
  *    AC2: Có phân trang khi quá 20 phòng
+ *    AC3: (bổ sung v0.2) Hiển thị số người đang ở so với số người tối đa, ví dụ 3/4
+ *         -> số người được ĐẾM từ bảng nguoi_o, không lưu thành một con số riêng
  *
  *  PH005 – LỌC PHÒNG THEO TRẠNG THÁI
  *    AC1: Chọn trạng thái thì danh sách lọc ngay không cần tải lại trang
@@ -17,9 +19,13 @@
 require __DIR__ . '/includes/init.php';
 require_login();   // Chủ trọ và Quản lý đều xem được
 
-// Lấy mọi phòng, kèm tên khách của hợp đồng còn hiệu lực (nếu có)
+// Lấy mọi phòng, kèm người đứng tên hợp đồng còn hiệu lực (nếu có)
+// và số người đang ở (AC3): đếm những người của hợp đồng đó chưa rời đi (ngay_roi để trống).
+// Phòng không có hợp đồng thì h.id rỗng nên đếm ra 0.
 $ds_phong = db()->query("
-    SELECT p.*, k.ho_ten AS khach_dang_o
+    SELECT p.*, k.ho_ten AS khach_dang_o,
+           (SELECT COUNT(*) FROM nguoi_o n
+            WHERE n.hop_dong_id = h.id AND n.ngay_roi IS NULL) AS so_nguoi_dang_o
     FROM phong p
     LEFT JOIN hop_dong h   ON h.phong_id = p.id AND h.trang_thai = 'hieu_luc'
     LEFT JOIN khach_thue k ON k.id = h.khach_thue_id
@@ -80,7 +86,8 @@ require __DIR__ . '/includes/header.php';
                     <th class="num">Diện tích</th>
                     <th class="num">Giá thuê / tháng</th>
                     <th>Trạng thái</th>
-                    <th>Khách đang ở</th>
+                    <th class="center" title="Số người đang ở / số người tối đa của phòng">Số người</th>
+                    <th>Người đại diện</th>
                     <th class="actions">Thao tác</th>
                 </tr>
             </thead>
@@ -92,6 +99,7 @@ require __DIR__ . '/includes/header.php';
                     <td class="num"><?= e(dien_tich($p['dien_tich'])) ?></td>
                     <td class="num"><?= e(tien($p['gia_thue'])) ?></td>
                     <td><?= nhan($p['trang_thai'], TRANG_THAI_PHONG) ?></td>
+                    <td class="center"><?= so_nguoi($p['so_nguoi_dang_o'], $p['so_nguoi_toi_da']) ?></td>
                     <td><?= $p['khach_dang_o'] ? e($p['khach_dang_o']) : '<span class="muted">—</span>' ?></td>
                     <td class="actions">
                         <a class="btn btn-sm" href="phong_chi_tiet.php?id=<?= (int)$p['id'] ?>">Xem</a>

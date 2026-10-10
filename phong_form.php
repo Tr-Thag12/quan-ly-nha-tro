@@ -13,6 +13,8 @@
  *            nên sửa giá niêm yết ở đây không làm thay đổi dữ liệu cũ.
  *    AC2: Lưu xong danh sách cập nhật ngay
  *         -> Lưu xong quay về danh sách và tô sáng dòng vừa sửa.
+ *    v0.2: không cho giảm "số người tối đa" xuống dưới số người đang ở,
+ *          nếu không danh sách phòng sẽ hiện vô lý kiểu 3/2.
  *
  *  Chỉ Chủ trọ được thêm/sửa phòng (cột "As a" trong Product Backlog).
  * =====================================================================
@@ -25,6 +27,7 @@ $la_sua = $id > 0;
 
 $phong_cu          = null;
 $hop_dong_hien_tai = null;
+$so_nguoi_dang_o   = 0;
 
 if ($la_sua) {
     $stmt = db()->prepare('SELECT * FROM phong WHERE id = ?');
@@ -36,11 +39,18 @@ if ($la_sua) {
     }
 
     // Hợp đồng còn hiệu lực của phòng (nếu có)
-    $stmt = db()->prepare("SELECT h.ma_hop_dong, h.gia_thue, k.ho_ten
+    $stmt = db()->prepare("SELECT h.id, h.ma_hop_dong, h.gia_thue, k.ho_ten
                            FROM hop_dong h JOIN khach_thue k ON k.id = h.khach_thue_id
                            WHERE h.phong_id = ? AND h.trang_thai = 'hieu_luc'");
     $stmt->execute([$id]);
     $hop_dong_hien_tai = $stmt->fetch();
+
+    // v0.2: số người đang ở theo hợp đồng đó
+    if ($hop_dong_hien_tai) {
+        $stmt = db()->prepare('SELECT COUNT(*) FROM nguoi_o WHERE hop_dong_id = ? AND ngay_roi IS NULL');
+        $stmt->execute([$hop_dong_hien_tai['id']]);
+        $so_nguoi_dang_o = (int)$stmt->fetchColumn();
+    }
 }
 
 // Dữ liệu hiển thị trên form: sửa thì lấy từ CSDL, thêm mới thì để trống
@@ -106,6 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!ctype_digit((string)$du_lieu['so_nguoi_toi_da'])
         || (int)$du_lieu['so_nguoi_toi_da'] < 1 || (int)$du_lieu['so_nguoi_toi_da'] > 10) {
         $loi['so_nguoi_toi_da'] = 'Số người tối đa từ 1 đến 10.';
+    } elseif ((int)$du_lieu['so_nguoi_toi_da'] < $so_nguoi_dang_o) {
+        // v0.2: không cho giảm xuống dưới số người đang ở
+        $loi['so_nguoi_toi_da'] = 'Phòng đang có ' . $so_nguoi_dang_o . ' người ở, số người tối đa không được nhỏ hơn '
+                                . $so_nguoi_dang_o . '.';
     }
 
     // ---- Tiện nghi (không bắt buộc) ----
@@ -178,7 +192,8 @@ require __DIR__ . '/includes/header.php';
 <?php if ($hop_dong_hien_tai): ?>
     <div class="alert alert-info form-note">
         Phòng đang cho thuê theo hợp đồng <strong><?= e($hop_dong_hien_tai['ma_hop_dong']) ?></strong>
-        (khách <?= e($hop_dong_hien_tai['ho_ten']) ?>, giá <?= e(tien($hop_dong_hien_tai['gia_thue'])) ?>).
+        (đứng tên <?= e($hop_dong_hien_tai['ho_ten']) ?>, <?= $so_nguoi_dang_o ?> người đang ở,
+        giá <?= e(tien($hop_dong_hien_tai['gia_thue'])) ?>).
         Nếu sửa giá thuê, giá mới chỉ áp dụng cho các hợp đồng ký sau; hợp đồng và hóa đơn đã chốt không thay đổi.
     </div>
 <?php endif; ?>

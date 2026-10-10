@@ -4,6 +4,8 @@
  *  PH006 – XEM CHI TIẾT PHÒNG
  *    AC1: Hiển thị thông tin phòng, khách đang ở, danh sách hợp đồng cũ
  *    AC2: Hiển thị các sự cố đã từng báo của phòng
+ *  v0.2: khung "Người đang ở" liệt kê đủ mọi người trong phòng (bảng nguoi_o),
+ *        đánh dấu người đại diện, khớp với con số 3/4 ở danh sách phòng.
  * =====================================================================
  */
 require __DIR__ . '/includes/init.php';
@@ -34,6 +36,17 @@ foreach ($ds_hop_dong as $hd) {
         $hop_dong_hien_tai = $hd;
         break;
     }
+}
+
+// v0.2: mọi người đang ở theo hợp đồng hiện tại, người đại diện lên đầu
+$ds_nguoi_o = [];
+if ($hop_dong_hien_tai) {
+    $stmt = db()->prepare('SELECT k.ho_ten, k.so_dien_thoai, k.cccd, k.que_quan, n.la_dai_dien, n.ngay_vao
+                           FROM nguoi_o n JOIN khach_thue k ON k.id = n.khach_thue_id
+                           WHERE n.hop_dong_id = ? AND n.ngay_roi IS NULL
+                           ORDER BY n.la_dai_dien DESC, n.ngay_vao, k.ho_ten');
+    $stmt->execute([$hop_dong_hien_tai['id']]);
+    $ds_nguoi_o = $stmt->fetchAll();
 }
 
 // AC2: các sự cố đã báo của phòng, mới nhất lên đầu
@@ -82,25 +95,40 @@ require __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <!-- Khách đang ở (AC1) -->
+    <!-- Người đang ở (AC1, v0.2) -->
     <div class="card">
-        <div class="card-head"><h2>Khách đang ở</h2></div>
+        <div class="card-head">
+            <h2>Người đang ở</h2>
+            <span class="muted"><?= so_nguoi(count($ds_nguoi_o), $phong['so_nguoi_toi_da']) ?> người</span>
+        </div>
         <div class="card-body">
             <?php if ($hop_dong_hien_tai): ?>
                 <?php
                 $hd = $hop_dong_hien_tai;
                 $con_lai = (int)floor((strtotime($hd['ngay_ket_thuc']) - strtotime(date('Y-m-d'))) / 86400);
                 ?>
-                <div class="tenant">
-                    <span class="avatar"><?= e(chu_cai_dau($hd['ho_ten'])) ?></span>
-                    <div>
-                        <strong><?= e($hd['ho_ten']) ?></strong>
-                        <div class="muted"><?= e(sdt($hd['so_dien_thoai'])) ?> &middot; <?= e($hd['que_quan']) ?></div>
-                    </div>
-                </div>
+                <?php if ($ds_nguoi_o): ?>
+                    <ul class="people">
+                        <?php foreach ($ds_nguoi_o as $ng): ?>
+                            <li class="tenant">
+                                <span class="avatar"><?= e(chu_cai_dau($ng['ho_ten'])) ?></span>
+                                <div>
+                                    <strong><?= e($ng['ho_ten']) ?></strong>
+                                    <?php if ((int)$ng['la_dai_dien'] === 1): ?>
+                                        <span class="badge badge-dai_dien">Đại diện</span>
+                                    <?php endif; ?>
+                                    <div class="muted small">
+                                        <?= e(sdt($ng['so_dien_thoai'])) ?> &middot; CCCD <?= e($ng['cccd']) ?> &middot; <?= e($ng['que_quan']) ?>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <div class="empty-box people-empty">Chưa ghi nhận người ở cho hợp đồng này.</div>
+                <?php endif; ?>
                 <dl class="info-list">
-                    <dt>Số CCCD</dt>           <dd><?= e($hd['cccd']) ?></dd>
-                    <dt>Hợp đồng</dt>          <dd><?= e($hd['ma_hop_dong']) ?></dd>
+                    <dt>Hợp đồng</dt>          <dd><?= e($hd['ma_hop_dong']) ?> <span class="muted">(đứng tên: <?= e($hd['ho_ten']) ?>)</span></dd>
                     <dt>Thời hạn</dt>
                     <dd>
                         <?= e(ngay($hd['ngay_bat_dau'])) ?> – <?= e(ngay($hd['ngay_ket_thuc'])) ?>

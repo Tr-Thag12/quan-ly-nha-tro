@@ -1,0 +1,4 @@
+# Thư mục chứa ảnh người dùng tải lên: không bao giờ chạy mã ở đây
+<FilesMatch "\.(php|php\d|phtml|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>

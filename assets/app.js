@@ -1,8 +1,12 @@
 /* =====================================================================
  *  JAVASCRIPT DÙNG CHUNG
- *  1. Hộp thoại xác nhận trước khi xóa           (PH003 – AC2)
- *  2. Lọc phòng theo trạng thái không tải lại trang (PH005 – AC1)
- *     và phân trang 20 phòng một trang            (PH004 – AC2)
+ *  1. Hộp thoại xác nhận trước khi xóa, thanh lý...  (PH003 – AC2)
+ *  2. Tự điền ô khi chọn phòng (tạo hợp đồng)         (HD001)
+ *  3. Tự tính số điện, số nước đã dùng khi gõ chỉ số   (DN001 – AC3)
+ *  4. Tự gửi form lọc khi đổi lựa chọn
+ *     4b. Đếm số ký tự của ô mô tả sự cố              (SC001)
+ *  5. Lọc phòng theo trạng thái không tải lại trang    (PH005 – AC1)
+ *     và phân trang 20 phòng một trang               (PH004 – AC2)
  * ===================================================================== */
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -12,13 +16,81 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('form[data-confirm]').forEach(function (form) {
         form.addEventListener('submit', function (event) {
             if (!window.confirm(form.getAttribute('data-confirm'))) {
-                event.preventDefault();   // bấm Hủy thì không gửi form, không xóa
+                event.preventDefault();   // bấm Hủy thì không gửi form
             }
         });
     });
 
     // ---------------------------------------------------------------
-    // 2. Lọc + phân trang danh sách phòng (chỉ chạy ở trang phong.php)
+    // 2. <select data-autofill>: chọn một dòng thì điền sẵn các ô khác.
+    //    Mỗi <option> mang thuộc tính data-fill-<id ô cần điền>="giá trị".
+    // ---------------------------------------------------------------
+    document.querySelectorAll('select[data-autofill]').forEach(function (chon) {
+        chon.addEventListener('change', function () {
+            var dong = chon.options[chon.selectedIndex];
+            Array.prototype.forEach.call(dong.attributes, function (thuocTinh) {
+                if (thuocTinh.name.indexOf('data-fill-') === 0) {
+                    var o = document.getElementById(thuocTinh.name.substring(10));
+                    if (o) {
+                        o.value = thuocTinh.value;
+                    }
+                }
+            });
+        });
+    });
+
+    // ---------------------------------------------------------------
+    // 3. Ô chỉ số mới có data-cu="chỉ số cũ" và data-ket-qua="id ô hiện kết quả":
+    //    gõ đến đâu, hiện số đã dùng đến đó (máy chủ vẫn kiểm tra lại khi lưu).
+    // ---------------------------------------------------------------
+    document.querySelectorAll('input[data-cu]').forEach(function (o) {
+        var ketQua = document.getElementById(o.getAttribute('data-ket-qua'));
+        if (!ketQua) {
+            return;
+        }
+        var capNhat = function () {
+            var moi = o.value.trim();
+            var cu = parseInt(o.getAttribute('data-cu'), 10);
+            if (moi === '' || !/^\d+$/.test(moi)) {
+                ketQua.textContent = '';
+                ketQua.className = 'dung';
+                return;
+            }
+            var dung = parseInt(moi, 10) - cu;
+            ketQua.textContent = dung < 0 ? 'nhỏ hơn số cũ!' : dung + ' ' + (o.getAttribute('data-don-vi') || '');
+            ketQua.className = dung < 0 ? 'dung text-red' : 'dung';
+        };
+        o.addEventListener('input', capNhat);
+        capNhat();
+    });
+
+    // ---------------------------------------------------------------
+    // 4. <select data-tu-gui>: đổi lựa chọn là tự lọc, không cần bấm nút
+    // ---------------------------------------------------------------
+    document.querySelectorAll('select[data-tu-gui]').forEach(function (chon) {
+        chon.addEventListener('change', function () {
+            chon.form.submit();
+        });
+    });
+
+    // ---------------------------------------------------------------
+    // 4b. <textarea maxlength data-dem="id ô hiện số">: đếm số ký tự đã gõ
+    //     (mô tả sự cố tối đa 500 ký tự – SC001)
+    // ---------------------------------------------------------------
+    document.querySelectorAll('textarea[data-dem]').forEach(function (o) {
+        var hien = document.getElementById(o.getAttribute('data-dem'));
+        if (!hien) {
+            return;
+        }
+        var dem = function () {
+            hien.textContent = o.value.length + '/' + o.getAttribute('maxlength');
+        };
+        o.addEventListener('input', dem);
+        dem();
+    });
+
+    // ---------------------------------------------------------------
+    // 5. Lọc + phân trang danh sách phòng (chỉ chạy ở trang phong.php)
     // ---------------------------------------------------------------
     var danhSach = document.getElementById('room-list');
     if (!danhSach) {

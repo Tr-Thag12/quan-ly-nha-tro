@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             DB_USER, DB_PASS,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
+        dong_bo_mui_gio($pdo);   // ngày "hôm nay" của dữ liệu mẫu tính theo giờ Việt Nam
 
         $sql = file_get_contents(__DIR__ . '/database.sql');
         $sql = preg_replace('/^\s*--.*$/m', '', $sql);             // bỏ các dòng chú thích
@@ -35,6 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $ket_qua = $so_cau;
+
+        // Dữ liệu đã về ban đầu nên xóa luôn các ảnh đã tải lên trước đó (ảnh CCCD, ảnh sự cố).
+        // Chỉ xóa file có tên do hệ thống đặt (24 ký tự 0-9a-f), không đụng tới file khác.
+        foreach (['cccd', 'su_co'] as $thu_muc) {
+            foreach (glob(__DIR__ . '/uploads/' . $thu_muc . '/*') ?: [] as $tep) {
+                if (preg_match('/^[0-9a-f]{24}\.(jpg|png|webp)$/', basename($tep))) {
+                    @unlink($tep);
+                }
+            }
+        }
         dang_xuat();   // dữ liệu đã làm mới nên đăng xuất phiên cũ (nếu có)
     } catch (PDOException $e) {
         $loi = $e->getMessage();
@@ -76,7 +87,11 @@ require __DIR__ . '/includes/header.php';
             </ul>
         <?php endif; ?>
 
-        <p>Trang này sẽ tạo cơ sở dữ liệu <code><?= e(DB_NAME) ?></code>, tạo 6 bảng và nạp dữ liệu mẫu gồm 24 phòng, 35 khách thuê (31 người đang ở), 19 hợp đồng và 3 tài khoản.</p>
+        <p>Trang này sẽ tạo cơ sở dữ liệu <code><?= e(DB_NAME) ?></code>, tạo 12 bảng và nạp dữ liệu mẫu gồm
+            24 phòng, 35 khách thuê (31 người đang ở), 19 hợp đồng, hóa đơn và tiền điện nước của 12 tháng gần nhất,
+            7 sự cố và 3 tài khoản.</p>
+        <p class="small muted">Ngày tháng trong dữ liệu mẫu được tính lùi từ ngày cài đặt, nên lúc nào cài lại cũng có
+            hợp đồng sắp hết hạn, hóa đơn quá hạn và tháng hiện tại chưa ghi điện nước để demo.</p>
         <div class="alert alert-warning" style="margin-top:16px">
             Nếu đã cài trước đó, toàn bộ dữ liệu hiện có sẽ bị xóa và nạp lại từ đầu.
         </div>

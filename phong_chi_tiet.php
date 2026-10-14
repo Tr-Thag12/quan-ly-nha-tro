@@ -64,8 +64,14 @@ require __DIR__ . '/includes/header.php';
         <p class="muted">Tầng <?= (int)$phong['tang'] ?> &middot; <?= e(dien_tich($phong['dien_tich'])) ?>
             &middot; Tối đa <?= (int)$phong['so_nguoi_toi_da'] ?> người</p>
     </div>
-    <?php if (is_chu_tro()): ?>
-        <div class="head-actions">
+    <div class="head-actions">
+        <?php if ($hop_dong_hien_tai): ?>
+            <a class="btn" href="hop_dong_chi_tiet.php?id=<?= (int)$hop_dong_hien_tai['id'] ?>">Xem hợp đồng</a>
+        <?php elseif ($phong['trang_thai'] === 'trong'): ?>
+            <a class="btn btn-primary" href="hop_dong_tao.php?phong_id=<?= (int)$phong['id'] ?>">+ Tạo hợp đồng</a>
+        <?php endif; ?>
+        <a class="btn" href="chi_so_lich_su.php?phong_id=<?= (int)$phong['id'] ?>">Lịch sử điện nước</a>
+        <?php if (is_chu_tro()): ?>
             <a class="btn" href="phong_form.php?id=<?= (int)$phong['id'] ?>">Sửa thông tin</a>
             <form method="post" action="phong_xoa.php" class="inline"
                   data-confirm="Bạn có chắc muốn xóa phòng <?= e($phong['ma_phong']) ?>? Thao tác này không thể hoàn tác.">
@@ -74,8 +80,8 @@ require __DIR__ . '/includes/header.php';
                 <input type="hidden" name="tu" value="chi_tiet">
                 <button type="submit" class="btn btn-danger">Xóa phòng</button>
             </form>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </div>
 </div>
 
 <div class="grid-2 even">
@@ -193,17 +199,22 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 </div>
 
+
 <!-- Sự cố đã báo (AC2) -->
 <div class="card section">
     <div class="card-head">
         <h2>Sự cố đã báo</h2>
-        <span class="muted"><?= count($ds_su_co) ?> sự cố</span>
+        <span class="muted"><?= count($ds_su_co) ?> sự cố
+            · <a href="bao_su_co.php?phong_id=<?= (int)$phong['id'] ?>">+ Ghi nhận sự cố</a>
+        </span>
     </div>
+
     <?php if ($ds_su_co): ?>
         <div class="table-wrap">
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Mã theo dõi</th>
                         <th>Ngày báo</th>
                         <th>Loại</th>
                         <th>Mô tả</th>
@@ -211,19 +222,27 @@ require __DIR__ . '/includes/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($ds_su_co as $sc): ?>
-                    <tr>
-                        <td class="nowrap"><?= e(ngay_gio($sc['ngay_bao'])) ?></td>
-                        <td><?= e($sc['loai']) ?></td>
-                        <td><?= e($sc['mo_ta']) ?></td>
-                        <td><?= nhan($sc['trang_thai'], TRANG_THAI_SU_CO) ?></td>
-                    </tr>
-                <?php endforeach; ?>
+                    <?php foreach ($ds_su_co as $sc): ?>
+                        <tr>
+                            <td class="nowrap">
+                                <a href="su_co_chi_tiet.php?id=<?= (int)$sc['id'] ?>">
+                                    <?= e($sc['ma_theo_doi']) ?>
+                                </a>
+                            </td>
+                            <td class="nowrap"><?= e(ngay_gio($sc['ngay_bao'])) ?></td>
+                            <td><?= e($sc['loai']) ?></td>
+                            <td><?= e($sc['mo_ta']) ?></td>
+                            <td><?= nhan($sc['trang_thai'], TRANG_THAI_SU_CO) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     <?php else: ?>
-        <div class="card-body"><div class="empty-box">Phòng chưa có sự cố nào được báo.</div></div>
+        <div class="card-body">
+            <div class="empty-box">Phòng chưa có sự cố nào được báo.</div>
+        </div>
     <?php endif; ?>
 </div>
+
 <?php require __DIR__ . '/includes/footer.php'; ?>

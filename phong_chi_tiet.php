@@ -199,16 +199,13 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 </div>
 
-
 <!-- Sự cố đã báo (AC2) -->
 <div class="card section">
     <div class="card-head">
         <h2>Sự cố đã báo</h2>
         <span class="muted"><?= count($ds_su_co) ?> sự cố
-            · <a href="bao_su_co.php?phong_id=<?= (int)$phong['id'] ?>">+ Ghi nhận sự cố</a>
-        </span>
+            · <a href="bao_su_co.php?phong_id=<?= (int)$phong['id'] ?>">+ Ghi nhận sự cố</a></span>
     </div>
-
     <?php if ($ds_su_co): ?>
         <div class="table-wrap">
             <table class="table">
@@ -222,27 +219,20 @@ require __DIR__ . '/includes/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($ds_su_co as $sc): ?>
-                        <tr>
-                            <td class="nowrap">
-                                <a href="su_co_chi_tiet.php?id=<?= (int)$sc['id'] ?>">
-                                    <?= e($sc['ma_theo_doi']) ?>
-                                </a>
-                            </td>
-                            <td class="nowrap"><?= e(ngay_gio($sc['ngay_bao'])) ?></td>
-                            <td><?= e($sc['loai']) ?></td>
-                            <td><?= e($sc['mo_ta']) ?></td>
-                            <td><?= nhan($sc['trang_thai'], TRANG_THAI_SU_CO) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
+                <?php foreach ($ds_su_co as $sc): ?>
+                    <tr>
+                        <td class="nowrap"><a href="su_co_chi_tiet.php?id=<?= (int)$sc['id'] ?>"><?= e($sc['ma_theo_doi']) ?></a></td>
+                        <td class="nowrap"><?= e(ngay_gio($sc['ngay_bao'])) ?></td>
+                        <td><?= e($sc['loai']) ?></td>
+                        <td><?= e($sc['mo_ta']) ?></td>
+                        <td><?= nhan($sc['trang_thai'], TRANG_THAI_SU_CO) ?></td>
+                    </tr>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     <?php else: ?>
-        <div class="card-body">
-            <div class="empty-box">Phòng chưa có sự cố nào được báo.</div>
-        </div>
+        <div class="card-body"><div class="empty-box">Phòng chưa có sự cố nào được báo.</div></div>
     <?php endif; ?>
 </div>
-
 <?php require __DIR__ . '/includes/footer.php'; ?>

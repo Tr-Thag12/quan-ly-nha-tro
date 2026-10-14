@@ -123,6 +123,14 @@ require __DIR__ . '/includes/header.php';
         </div>
         <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
     </form>
-    <p class="auth-foot"><?= e(APP_VERSION) ?></p>
+    <<!-- SC001: Khách thuê không có tài khoản -->
+<div class="public-links">
+    Khách thuê:
+    <a href="bao_su_co.php">Báo sự cố</a>
+    ·
+    <a href="tra_cuu_su_co.php">Tra cứu sự cố</a>
+</div>
+
+<p class="auth-foot">Phiên bản <?= e(APP_VERSION) ?></p>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

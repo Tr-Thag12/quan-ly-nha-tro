@@ -45,6 +45,7 @@ $la_trang_auth = !empty($auth_page);
                 <a href="hop_dong.php"<?= menu_active(['hop_dong', 'nguoi_o']) ?>>Hợp đồng</a>
                 <a href="chi_so.php"<?= menu_active('chi_so') ?>>Điện nước</a>
                 <a href="hoa_don.php"<?= menu_active(['hoa_don', 'nhac_no']) ?>>Hóa đơn</a>
+                <a href="su_co.php"<?= menu_active(['su_co', 'bao_su_co']) ?>>Sự cố</a>
                 <?php if (is_chu_tro()): /* TK005: tài khoản Quản lý không thấy 3 mục dưới */ ?>
                     <a href="bao_cao.php"<?= menu_active('bao_cao') ?>>Báo cáo</a>
                     <span class="menu-sep" aria-hidden="true"></span>

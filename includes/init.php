@@ -8,4 +8,5 @@ require_once __DIR__ . '/functions.php';   // hàm dùng chung, đăng nhập, p
 require_once __DIR__ . '/hop_dong.php';    // Epic Quản lý hợp đồng, người ở cùng
 require_once __DIR__ . '/dien_nuoc.php';   // Epic Ghi chỉ số điện nước
 require_once __DIR__ . '/hoa_don.php';     // Epic Hóa đơn và thu tiền
+require_once __DIR__ . '/su_co.php';       // Epic Sự cố và bảo trì
 require_once __DIR__ . '/tai_len.php';     // Lưu ảnh tải lên (ảnh CCCD, ảnh sự cố)

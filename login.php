@@ -123,14 +123,10 @@ require __DIR__ . '/includes/header.php';
         </div>
         <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
     </form>
-    <<!-- SC001: Khách thuê không có tài khoản -->
-<div class="public-links">
-    Khách thuê:
-    <a href="bao_su_co.php">Báo sự cố</a>
-    ·
-    <a href="tra_cuu_su_co.php">Tra cứu sự cố</a>
-</div>
-
-<p class="auth-foot">Phiên bản <?= e(APP_VERSION) ?></p>
+    <!-- SC001: khách thuê không có tài khoản, báo sự cố và tra cứu tiến độ không cần đăng nhập -->
+    <div class="public-links">
+        Khách thuê: <a href="bao_su_co.php">Báo sự cố</a> · <a href="tra_cuu_su_co.php">Tra cứu tiến độ</a>
+    </div>
+    <p class="auth-foot">Phiên bản <?= e(APP_VERSION) ?></p>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

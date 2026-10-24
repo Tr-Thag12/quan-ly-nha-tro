@@ -23,10 +23,11 @@ $la_trang_auth = !empty($auth_page);
     <div class="topbar-inner">
         <a class="brand" href="index.php">
             <span class="brand-logo">NT</span>
-            <span><?= e(APP_NAME) ?></span>
+            <span class="brand-text"><?= e(APP_NAME) ?><small><?= e(TEN_NHA_TRO) ?></small></span>
         </a>
         <?php if ($nguoi_dung): ?>
             <div class="user-box">
+                <span class="user-avatar" aria-hidden="true"><?= e(chu_cai_dau($nguoi_dung['ho_ten'])) ?></span>
                 <div class="user-info">
                     <span class="user-name"><?= e($nguoi_dung['ho_ten']) ?></span>
                     <span class="user-role"><?= e(VAI_TRO[$nguoi_dung['vai_tro']]) ?></span>

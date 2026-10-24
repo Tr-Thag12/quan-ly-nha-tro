@@ -88,11 +88,21 @@ $page_title = 'Đăng nhập';
 $auth_page  = true;
 require __DIR__ . '/includes/header.php';
 ?>
+<div class="auth-split">
+<aside class="auth-brand">
+    <span class="brand-logo lg">NT</span>
+    <p class="auth-kicker"><?= e(TEN_NHA_TRO) ?></p>
+    <h2><?= e(APP_NAME) ?></h2>
+    <p class="auth-lead">Ứng dụng web giúp chủ trọ quản lý phòng, khách thuê, hợp đồng, điện nước, hóa đơn, sự cố và báo cáo.</p>
+    <ul class="auth-tags">
+        <li>Phòng</li><li>Khách thuê</li><li>Hợp đồng</li><li>Điện nước</li><li>Hóa đơn</li><li>Sự cố</li><li>Báo cáo</li>
+    </ul>
+</aside>
 <div class="card auth-card">
     <div class="auth-head">
         <span class="brand-logo lg">NT</span>
-        <h1><?= e(APP_NAME) ?></h1>
-        <p class="muted">Đăng nhập để tiếp tục</p>
+        <h1>Đăng nhập</h1>
+        <p class="muted">Dành cho Chủ trọ và Quản lý</p>
     </div>
 
     <?php if (isset($_GET['da_dang_xuat'])): ?>
@@ -128,5 +138,6 @@ require __DIR__ . '/includes/header.php';
         Khách thuê: <a href="bao_su_co.php">Báo sự cố</a> · <a href="tra_cuu_su_co.php">Tra cứu tiến độ</a>
     </div>
     <p class="auth-foot">Phiên bản <?= e(APP_VERSION) ?></p>
+</div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>
